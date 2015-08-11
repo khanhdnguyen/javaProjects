@@ -1,0 +1,132 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class Personality {
+
+	public static final int NUM_OF_DIMENSIONS = 4;
+	public static final int TOTAL_QUESTIONS = 70; 
+
+	public static void main(String[] args) throws FileNotFoundException {
+		Scanner keyboard = new Scanner (System.in);
+		Scanner fileReader = new Scanner(new File (getInFile(keyboard)));
+		int sizeInFile = fileReader.nextInt();
+		fileReader.nextLine();
+		String person = "";
+		String ans = "";
+		String[] names = new String[sizeInFile];
+		String[] answers = new String[sizeInFile];
+		getInfo(names, answers, sizeInFile, fileReader);
+		for (int i = 0; i < sizeInFile; i ++) {
+			person = names[i];
+			ans = answers[i];
+			bodyOfProgram(person, ans, sizeInFile);
+		}
+		keyboard.close();
+		fileReader.close();
+	}
+
+	//This method calculates the total percentage for each person, calculate and assign 
+	//each dimension letter to each person. At the end of the method, it will print out 
+	//everyone's result. 
+	public static void bodyOfProgram(String person, String ans, int sizeInFile) {
+		char[] letters = ans.toCharArray();
+		String types = "EISNTFJP";
+		String result = "";
+		int[] percent = new int[NUM_OF_DIMENSIONS];
+		for (int dim = 1; dim <= NUM_OF_DIMENSIONS; dim++) {
+			percent[dim - 1] = getPercent(letters, dim);
+			if (percent[dim - 1] == -1) result = "----";
+			else if (percent[dim - 1] > 50) result += types.charAt(2*dim-1);  
+			else if (percent[dim - 1] < 50) result += types.charAt(2*dim-2);
+			else if (percent[dim-1] == 50) result += "X";   
+		}
+		printResult(person, result, percent);
+	}
+
+	//this method prints out the result of each person
+	public static void printResult(String person, String result, int[] percent) {
+		System.out.printf( "%28s:", person);
+		for (int i = 0; i < NUM_OF_DIMENSIONS; i++) {
+			if (percent[i] == -1) System.out.printf("%11s", "NO ANSWER");
+			else{
+				System.out.printf("%11d", percent[i]);
+			}
+		}
+		System.out.printf(" =%5s\n", result);
+	}
+
+	//returns the percentage of different dimensions 
+	public static int getPercent(char[] letters, int dim) {
+		int a = 0, b = 0, count = 0;
+		int returnPercent=0;
+		if (dim == 1)  returnPercent += testDimOne(count, a, b, letters);
+		else if (dim >= 2) returnPercent += otherDimTest(count, a, b, letters, dim);
+		else if (testDimOne(count, a, b, letters) == -1 || 
+				otherDimTest(count, a, b, letters, dim) == -1) {
+			returnPercent = -1;
+		}
+		return returnPercent;
+	}
+
+	//return the percentage of other dimensions besides the first dimension
+	public static int otherDimTest(int count, int a, int b, char[] letters, int dim) {
+		int product = 0;
+		while ((7 * count + 2 + 2 * (dim-2)) <= TOTAL_QUESTIONS) {
+			int calcAns = 7 * count + 2 + 2 * (dim-2);
+			char first = letters[calcAns - 1];
+			char second = letters[calcAns];
+			if (first == 'A') a++;
+			else if (first == 'B') b++;
+			if (second == 'A') a++;
+			else if (second == 'B') b++;
+			count++;
+		}
+		double total = a + b;
+		double percent = b / total * 100;
+		if ( a==0 && b==0) product= -1;   
+		else {
+			product= (int) Math.round(percent);
+		}
+		return product;
+	}
+
+	//This method calculate the percentage of the first dimension
+	public static int testDimOne(int count, int a, int b, char[] letters) {
+		int product = 0;
+		while ((count * 7) + 1 <= TOTAL_QUESTIONS) {
+			char current = letters[count * 7];
+			if (current == 'A') a++;
+			else if (current == 'B') b++;
+			count++;
+		}
+		double sum = a + b;
+		double percent = (b/sum) * 100;
+		if ( a==0 && b==0){
+			product= -1;   
+		}
+		else {
+			product= (int) Math.round(percent);
+		}
+		return product;
+	}
+
+	//This method stores the name and the answers by the void method
+	public static void getInfo(String[] names, String[] answers,
+			int size, Scanner input) {
+		for(int i = 0; i < size; i++) {
+			String person = input.nextLine();
+			String ans = input.nextLine();
+			names[i] = person;
+			answers[i] = ans;
+		}
+	}
+
+	// Suggested method to get the name of the input file.
+	public static String getInFile(Scanner keyboard) {
+		String dataFile = "";
+		System.out.print("Enter the name of the file with the personality data: ");
+		dataFile = keyboard.nextLine().trim();
+		return dataFile;    
+	}
+}
