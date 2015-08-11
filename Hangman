@@ -1,0 +1,170 @@
+
+import java.util.Scanner;
+
+public class Hangman {
+
+	public static final int WRONG_GUESS = 5;
+
+	public static void main(String[] args) {
+		intro();
+		PhraseBank phrases = new PhraseBank();
+		Scanner keyboard = new Scanner(System.in);
+		boolean startOfGame = true;
+		int guesses = 0;
+		String topic = phrases.getTopic();
+		while(startOfGame) {
+			System.out.println("I am thinking of a " + topic + " ...\n");
+			String wordPhrase = phrases.getNextPhrase();
+			String theAlphabets = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z ";
+			String thePhrase = displayAsterisk(wordPhrase);
+			gameBody(theAlphabets, wordPhrase, thePhrase, guesses, keyboard);
+			startOfGame = playAgain(keyboard);
+		}
+	}
+
+	// show the intro to the program
+	public static void intro() {
+		System.out.println("This program plays the game of hangman.");
+		System.out.println("When the window opens select the file");
+		System.out.println("with the phrases you want to use.\n");
+		System.out.println("The computer will pick a random phrase.");
+		System.out.println("Enter capital letters as your guesses.");
+		System.out.println("After " + WRONG_GUESS + " wrong guesses you lose.");
+	}
+
+	//This method hides the phrase with asterisks. The hidden message with beneath the asterisks. 
+	public static String displayAsterisk(String wordPhrase) {
+		String displayStar = "";
+		int countPhrase = wordPhrase.length();
+		for (int i = 0; i < countPhrase; i++) {
+			if (wordPhrase.charAt(i) != '_') {
+				displayStar += '*';
+			}
+			else {
+				displayStar += '_';
+			}
+		}
+		return displayStar;
+	}
+
+	//This method is the main body in which the game is executed 
+	public static void gameBody(String theAlphabets, String actualPhrase, String displayPhrase, 
+			int guesses, Scanner keyboard) {
+		boolean start = true;
+		while (start) {
+			System.out.println("The current phrase is " + displayPhrase);
+			String userInput = checkUserLetter(keyboard, theAlphabets);
+			char userLetter = userInput.charAt(0);
+			guesses = guessCheck(guesses, userInput, actualPhrase); 
+			theAlphabets = updateAlphabet(userLetter, theAlphabets);
+			checkUserLetter(userInput, guesses, actualPhrase);
+			displayPhrase = removeAsterisk(userLetter, displayPhrase, actualPhrase);
+			start = resultOfGame(guesses, displayPhrase, actualPhrase);
+		}
+	}
+
+	//This method checks if userInput is present in the alphabets 
+	public static String checkUserLetter(Scanner keyboard, String alphabets) {
+		String input = "";
+		boolean check = true;
+		while (check) {
+			System.out.println("The letters you have not guessed are:\n" + alphabets);
+			System.out.print("Enter your next guess: ");
+			input = keyboard.next().toUpperCase();
+			System.out.println();
+			if (alphabets.contains(input)) {
+				check = false;
+			}
+			else {
+				System.out.println(input + " is not a valid guess");
+				check = true;
+			}
+		}
+		return input;
+	}
+
+	//This method count the number of wrong guesses the user make
+	public static int guessCheck(int guess, String user, String phrase) {
+		if (!(phrase.contains(user))) {
+			guess++;
+		}
+		return guess;
+	}
+
+	//This method checks to see if what the userInput typed is in the phrase 
+	public static void checkUserLetter(String user, int guess, String phrase) {
+		if (phrase.contains(user)) {
+			System.out.println("You guessed " + user + ".");
+			System.out.println("That is present in the secret phrase.");
+			if (guess == 1)
+				System.out.println("You have made "+ guess + " wrong guess. \n");
+			else
+				System.out.println("You have made "+ guess + " wrong guesses. \n");
+		}
+		else {
+			System.out.println("You guessed " + user + ".");
+			System.out.println("That is not present in the secret phrase.");
+			if (guess == 1)
+				System.out.println("You have made "+ guess + " wrong guess. \n");
+			else 
+				System.out.println("You have made "+ guess + " wrong guesses. \n");
+		}
+	}
+
+	//This method updates the alphabet when a user type in a letter that exists in the phrase
+	public static String updateAlphabet(char user, String alphabets) {
+		int update = 0;
+		while ((update < alphabets.length()) && (alphabets.charAt(update) != user)) {
+			update++;
+		}
+		String firstHalf = alphabets.substring(0, update);
+		String secondHalf = alphabets.substring(update + 2);
+		return firstHalf + secondHalf;
+	}
+
+	//This method replaces the asterisk with the user input depending if that letter exists or not
+	public static String removeAsterisk(char user, String asteriskPhrase, String phrase) {
+		String replaceAsterisk = "";
+		for (int i = 0; i < asteriskPhrase.length(); i++) {
+			char realPhrase = phrase.charAt(i);
+			char current = asteriskPhrase.charAt(i);
+			if (realPhrase == user) {
+				replaceAsterisk += user;
+			}
+			else if (realPhrase == current) {
+				replaceAsterisk += current;
+			}
+			else if (realPhrase == '_') {
+				replaceAsterisk += '_';
+			}
+			else if (current == '*') {
+				replaceAsterisk += '*';
+			}
+		}
+		return replaceAsterisk;
+	}
+
+	//This method displays the result of the game after a user guessed the phrase or 5 wrong guesses
+	public static boolean resultOfGame(int guess, String currentPhrase, String thePhrase) {
+		if (thePhrase.contains(currentPhrase)) {
+			System.out.println("The phrase is " + thePhrase + ".");
+			System.out.println("YOU WIN!!!! \n");
+			return false;
+		}
+		else if (guess == WRONG_GUESS) {
+			System.out.println("You lose. The secret phrase was " + thePhrase + "\n");
+			return false;
+		}
+		return true;
+	}
+
+	//This method ask the user to see if they want to play again or not
+	public static boolean playAgain(Scanner keyboard) {
+		System.out.println("Do you want to play again?");
+		System.out.print("Enter 'Y' or 'y' to play again: ");
+		String userInput = keyboard.next();
+		return ((userInput.charAt(0) == 'Y') || (userInput.charAt(0) == 'y'));
+	}
+}
+
+
