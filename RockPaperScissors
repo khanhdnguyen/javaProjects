@@ -1,0 +1,130 @@
+import java.util.Scanner;
+
+public class RockPaperScissors {
+	public static final int ROCK = 1;
+	public static final int PAPER = 2;
+	public static final int SCISSORS = 3;
+	public static final int WIN = 1;
+	public static final int LOSE = 2;
+	public static final int DRAW = 3;
+
+	public static void main(String[] args) {
+		int win = 0, lose = 0, draw = 0, userPick = 0;
+		Scanner sc = new Scanner(System.in);
+		RandomPlayer cpu = new RandomPlayer();
+		int cpuChoice = cpu.play();
+		String user = introGame(sc);
+		int userRound = askUserRound(sc, user);
+		for (int i = 1; i <= userRound; i++) {
+			userPick = bodyRound(user, sc, cpuChoice, i);
+			if (userPick == WIN) {
+				win++;
+			}
+			else if (userPick == LOSE) {
+				lose++;
+			}
+			else {
+				draw++;
+			}
+		}
+		gameResult(userRound, user, win, lose, draw);
+	}
+
+	//This method prints out the intro and asks the user for their name
+	public static String introGame(Scanner sc) {
+		String pickName = "";
+		System.out.print("Welcome to Rock Paper Scissors. ");
+		System.out.println("I, Computer, will be your opponent.");
+		System.out.print("Please type in your name and press return: ");
+		pickName = sc.nextLine();
+		System.out.println("Welcome " + pickName);
+		return pickName;
+	}
+
+	//This method asks how many rounds does the user wants to play
+	public static int askUserRound(Scanner sc, String user) {
+		System.out.println("All right " + user + ". How many rounds would you like to play?");
+		System.out.print("Enter the number of rounds you want to play and press return: ");
+		int pickRounds = sc.nextInt();
+		sc.nextLine();
+		System.out.println();
+		return pickRounds;
+	}
+
+	//This method is the main game method where each round is executed.
+	public static int bodyRound(String userName, Scanner sc, int compNum, int rounds) {
+		System.out.println("Round " + rounds + ".");
+		System.out.println(userName + ", please enter your choice for this round.");
+		System.out.print(ROCK + " for rock, " + PAPER + " for paper, " + SCISSORS + " for scissors: ");
+		int	userChoice = sc.nextInt();
+		//		sc.nextLine(); is this necessary? 
+		System.out.print("Computer picked " + checkAnswer(compNum) + ", ");
+		System.out.println(userName + " picked " + checkAnswer(userChoice) + ".\n");
+		return checkStatus(userChoice, compNum);
+	}
+
+	//This method compares the user's and the computer's answer to determine who wins, lose, or draw
+	public static int checkStatus(int userPick, int compPick) {
+		if (userPick == ROCK && compPick == SCISSORS) {
+			System.out.println("Rock breaks scissors. I win.\n\n");
+			return WIN;
+		}
+		else if (userPick == PAPER && compPick == ROCK) {
+			System.out.println("Paper covers rock. I win.\n\n");
+			return WIN;
+		}
+		else if (userPick == SCISSORS && compPick == PAPER) {
+			System.out.println("Scissors cut paper. I win.\n\n");
+			return WIN;
+		}
+		if (userPick == SCISSORS && compPick == ROCK) {
+			System.out.println("Rock breaks scissors. You win.\n\n");
+			return LOSE;
+		}
+		else if (userPick == ROCK && compPick == PAPER) {
+			System.out.println("Paper covers rock. You win.\n\n");
+			return LOSE;
+		}
+		else if (userPick == PAPER && compPick == SCISSORS) {
+			System.out.println("Scissors cut paper. You win.\n\n");
+			return LOSE;
+		}
+		else {
+			System.out.println("This is a draw.\n\n");
+			return DRAW;
+		}
+	}
+
+	//This method converts the number into either rock, paper, or scissors.
+	public static String checkAnswer(int num) {
+		if (num == ROCK) {
+			return "rock";
+		}
+		if (num == PAPER) {
+			return "paper";
+		}
+		if (num == SCISSORS) {
+			return "scissors";
+		}
+		return ""; 
+	}
+
+	//This method displays the result at the end of the game
+	public static void gameResult(int rounds, String userName, int win, int lose, int draw) {
+		System.out.println("Number of games of Rock Paper Scissors: " + rounds);
+		System.out.println("Number of times Computer won: " + lose);
+		System.out.println("Number of times " + userName + " won: " + win);
+		System.out.println("Number of draws: " + draw);
+		if (win > lose) {
+			System.out.println("You are the master at Rock, Paper, Scissors.");
+		}
+		else if (lose > win) {
+			System.out.println("I, Computer, am a master at Rock, Paper, Scissors.");
+		}
+		else {
+			System.out.println("We are evenly matched at this game.");
+		}
+	}
+}
+
+
