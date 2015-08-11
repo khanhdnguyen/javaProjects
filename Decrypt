@@ -1,0 +1,100 @@
+import java.util.Scanner;
+
+public class Decrypt {
+
+	public static final int ASCII_START = 32;
+	public static final int ASCII_END = 127;
+	public static final int TOTAL_CHAR = 128;
+
+	public static void main(String[] arg) {
+		String encryptedText = DecryptUtilities.convertFileToString();
+		int[] list = new int[TOTAL_CHAR];
+		boolean test = true;
+		Scanner console = new Scanner(System.in);
+		frequency(encryptedText, list, encryptedText);
+		char[] decryptKey = DecryptUtilities.getDecryptionKey(list);
+		displayText(decryptKey);
+		encryptedText = update(encryptedText, decryptKey);
+		while (test) {
+			System.out.println(encryptedText);
+			String userInput = ask(console);
+			if (userInput.equals("y")) {
+				encryptedText = userSwap(console, decryptKey, encryptedText);
+			}
+			else {
+				test = false;
+				displayText(decryptKey);
+				System.out.println("The final version of the decrypted text is:\n");
+				System.out.print(encryptedText);
+			}
+		}
+	}
+
+	//this method takes in the user's answer and swap the character within the decryption key
+	public static String userSwap(Scanner sc, char[] decryptText, String encryptText) {
+		System.out.print("Enter the character in the decrypted text you want to change: ");
+		String firstAns = sc.next();
+		char first = firstAns.charAt(0);
+		System.out.print("Enter the character you want to change '" + firstAns + "' to: ");
+		String secAns = sc.next();
+		char sec = secAns.charAt(0);
+		System.out.println("'" + firstAns + "' will be swapped with '" + secAns +"' in the decrypted file.\n");
+		decryptText[first] = sec;
+		decryptText[sec] = first;
+		return updateLetter(first, sec, decryptText, encryptText);
+	}
+
+	//this method compares the user's answer with the decrypt key and printed out the swapped characters
+	public static String updateLetter(char first, char sec, char[] decryptText, 
+			String encrypt) {
+		String currentText = "";
+		for (int i = 0; i < encrypt.length(); i++) {
+			if (encrypt.charAt(i) != sec && encrypt.charAt(i) != first) {
+				currentText += encrypt.charAt(i);
+			}
+			else currentText += decryptText[encrypt.charAt(i)];
+		}
+		return currentText;
+	}
+
+	//this method ask the user to type in either y or n
+	public static String ask(Scanner sc) {
+		System.out.println("Do you want to make a change to the key?");
+		System.out.print("Enter 'Y' or 'y' to make change: ");
+		String input = sc.next();
+		input = input.toLowerCase();
+		return input;
+	}
+
+	//This method updates the original script with a new encoded text that contains the decryption
+	public static String update(String encrypt, char[] decrypt) {
+		String text = "";
+		System.out.println("The current version of the decrypted text is:\n");
+		for (int i = 0; i < encrypt.length();i++) {
+			text += decrypt[encrypt.charAt(i)];
+		}
+		return text;
+	}
+
+	//This method prints and displays the encrypted and decrypted keys
+	public static void displayText(char[] key) {
+		System.out.println("\nThe current version of the key for ASCII characters 32 to 126 is:");
+		for (int i = ASCII_START; i < ASCII_END; i++) {
+			System.out.println("Encrypted character: " + (char)i + ", decrypted character: " + key[i]);
+		}
+		System.out.println();
+	}
+
+	//This method prints out the frequency of the characters
+	public static void frequency(String encrypt, int[] list, String encryptedText) {
+		System.out.println("The encrypted text is:\n");
+		System.out.println(encryptedText);
+		for (int i = 0; i < encrypt.length(); i++) {
+			list[encrypt.charAt(i)]++;
+		}
+		System.out.println("Frequencies of characters.\nCharacter - Frequency");
+		for (int j = ASCII_START; j < ASCII_END; j++) {
+			System.out.println((char)j + " - " + list[j]);
+		}
+	}
+}
