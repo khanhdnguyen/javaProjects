@@ -1,0 +1,139 @@
+import java.io.*;
+import java.util.*;
+
+// Add import statements here.
+public class WordProcessor{
+	public static void main(String [] args) throws FileNotFoundException {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter name of file to be processed, including the .txt extension: ");
+		String fileName = sc.nextLine(); //when user type in a filename 
+		Scanner input = new Scanner(new File(fileName)); 
+		int firstInt = input.nextInt(); 
+		String replaceTxt = fileName.replace(".txt", "") + "_OUT.txt";
+		PrintStream print = new PrintStream(new File(replaceTxt)); 
+		String numbers = printNum(firstInt); //stored an int as a string
+		String output = processLetters(input, firstInt); //stores all the words to be printed out
+		print.println(numbers + "\n" + output); 
+		sc.close();
+		print.close();
+	}
+
+	//This method process several methods to display the numbers and the dashes
+	public static String printNum(int firstIntFromFile) {
+		int firstRowNum = firstIntFromFile / 10; //This number represents the first line of numbers
+		int modulus = firstIntFromFile % 10; //This number represents the second line of the last few numbers 
+		String countNum = "", storeNumCount = "";
+		for (int firstRow = 0; firstRow <= firstRowNum; firstRow++) {
+			storeNumCount =  firstNumRowProcess(firstRowNum, modulus, firstRow);
+			countNum += storeNumCount;
+		}
+		countNum += "\n";
+		for (int secondRow = 0; secondRow <= firstRowNum; secondRow++) {
+			storeNumCount = secondNumRowProcess(firstRowNum, modulus, secondRow);
+			countNum += storeNumCount;
+		}
+		countNum += "\n";
+		//This loop prints out a number of dashes according to the first int in the file
+		for (int dashes = 0; dashes < firstIntFromFile; dashes++) {
+			countNum += "-";
+		}
+		return countNum;
+	}
+
+	//This method prints out the first row of numbers
+	public static String firstNumRowProcess(int firstRowNum, int mod, int firstLoop) {
+		String printTopNum = "";
+		if (firstLoop == firstRowNum) {
+			for (int i = 0; i < mod + 1; i++) {
+				printTopNum += firstLoop;
+			}
+		}
+		else if (firstLoop == 0) {
+			for (int j = 0; j < 9; j++) {
+				printTopNum += firstLoop;
+			}
+		}
+		else {
+			for (int k = 0; k < 10; k++) {
+				printTopNum += firstLoop;
+			}
+		}
+		return printTopNum;
+	}
+
+	//This method prints out the second row of numbers
+	public static String secondNumRowProcess(int firstRowNum, int mod, int secondLoop) {
+		String printBottomNum = "";
+		if (secondLoop == firstRowNum) {
+			for (int lastFewNum = 1; lastFewNum <= mod; lastFewNum++) {
+				printBottomNum += lastFewNum;
+			}
+		}
+		else {
+			for (int i = 1; i <= 10; i++) {
+				if (i == 10) {
+					printBottomNum += 0;
+				}
+				else {
+					printBottomNum += i;
+				}
+			}
+		}
+		return printBottomNum;
+	}
+
+	//This method process each lines with the correct adjustment to the words and spaces
+	public static String processLetters(Scanner input, int firstInt) {
+		String storeWords = "";
+		String currentWords = "";
+		String capLetters = capWords(input, currentWords, storeWords);
+		Scanner sc = new Scanner(capLetters);
+		String newWord = sc.next();
+		String fixLine = adjustEachLine(capLetters, firstInt, sc, newWord);
+		return fixLine;
+	}
+
+	//This method adjust the line's width according to the number from the file
+	public static String adjustEachLine(String fixedWord, int intFromFile, Scanner sc, String newWord) {
+		int countLength = 0;
+		String currentWord = "";
+		countLength = newWord.length() + 1;
+		currentWord += newWord;
+		while (sc.hasNext()) {
+			String nextNewWord = sc.next();
+			countLength += nextNewWord.length() + 1;
+			if (countLength <= intFromFile) {
+				currentWord += " " + nextNewWord;
+			}
+			else {
+				currentWord += "\n" + nextNewWord;
+				countLength = nextNewWord.length();
+			}
+		}
+		return currentWord;
+	}
+
+	//This method capitalizes the first letter of the first word after the period
+	public static String capWords(Scanner input, String previousWord, String stored) {
+		int count = 0;
+		String firstWord = input.next();
+		firstWord = firstWord.substring(0, 1).toUpperCase() + firstWord.substring(1);
+		String nextWord = "";
+		while (input.hasNext()) {
+			if (count == 0) {
+				stored += firstWord;
+			}
+			if (input.hasNext()) {
+				nextWord = input.next();
+				if (stored.contains(".")) {
+					stored += " " + nextWord.substring(0, 1).toUpperCase() + nextWord.substring(1);
+				}
+				else {
+					stored += " " + nextWord;
+				}
+			}
+			count++;
+		}
+		return stored;
+	}
+}
