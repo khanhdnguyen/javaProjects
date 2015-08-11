@@ -1,0 +1,20 @@
+
+import java.util.Random;
+public class RandomPlayer
+{
+    private Random rand;
+    
+    RandomPlayer () 
+    {
+        rand = new Random();
+    }
+    
+    /*
+     * Generates a random sequence of integers among 1, 2, and 3.
+     */
+    public int play ()
+    {
+        int play = 1 + rand.nextInt(3);
+        return play;
+    }
+}
